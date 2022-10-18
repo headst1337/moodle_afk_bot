@@ -1,2 +1,14 @@
-# EIOS-Afk-Bot
-Bot for sitting afk in the test and scrolling through assignments
+### Requirements
+**- You need to download [ChromeDriver]( https://chromedriver.chromium.org/ "ChromeDriver") of the same version as your browser**
+
+**- Create file `accounts.txt`**
+
+**- Install requirements**
+```bash
+pip install -r requirements.txt
+```
+
+### How it run
+```bash
+python manager.py
+```
