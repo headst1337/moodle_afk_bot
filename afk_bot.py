@@ -38,8 +38,9 @@ class Eios:
         # Открытие старницы с тестом
         self.driver.get(url)
         time.sleep(random.randrange(2, 5))
-        # Нажатие кнопки, которая открывает тест
-        self.driver.find_element(By.XPATH, start_test_button_xpath).click()
+        # Нажатие кнопку, которая открывает тест
+        try: self.driver.find_element(By.XPATH, start_test_button_xpath).click()
+        except: self.driver.find_element(By.XPATH, alternative_start_test_button_xpath).click()
         time.sleep(random.randint(2, 5))
         log.info(f"Started {self.username}")
         start_time = time.time()
