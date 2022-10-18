@@ -14,12 +14,12 @@ def parse_accounts():
             password_list.append(line.split(" ")[1])
     return(username_list, password_list)        
 
-parse_accounts()
 
 def instantiation(i):
     instance = Eios(username=username_list[i], password=password_list[i])
 
-for i in range(len(password_list)):
-    thread = threading.Thread(target=instantiation, args=[i])
-    thread.start()
-    
+if __name__ == "__main__":
+    parse_accounts()
+    for i in range(len(password_list)):
+        thread = threading.Thread(target=instantiation, args=[i])
+        thread.start()
