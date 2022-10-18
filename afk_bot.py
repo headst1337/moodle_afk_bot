@@ -18,9 +18,10 @@ class Eios:
     def __init__(self, username, password) -> None:
         self.username = username
         self.password = password
-        self.options = webdriver.ChromeOptions()
-        self.options.add_argument('headless')
-        self.driver = webdriver.Chrome(options=self.options)
+        # self.options = webdriver.ChromeOptions()
+        # self.options.add_argument('headless')
+        # self.driver = webdriver.Chrome(options=self.options)
+        self.driver = webdriver.Chrome()
         self._auth()
 
     def _auth (self) -> None:
@@ -32,9 +33,9 @@ class Eios:
         self.driver.find_element(By.XPATH, login_button_xpath).click()
         time.sleep((random.randrange(2, 5)))
         log.info(f"Auth as {self.username} {self.password}")
-        self._start_test()
+        self._open_test()
 
-    def _start_test(self) -> None:
+    def _open_test(self) -> None:
         # Открытие старницы с тестом
         self.driver.get(url)
         time.sleep(random.randrange(2, 5))
@@ -43,16 +44,23 @@ class Eios:
         except: self.driver.find_element(By.XPATH, alternative_start_test_button_xpath).click()
         time.sleep(random.randint(2, 5))
         log.info(f"Started {self.username}")
-        start_time = time.time()
-        # Проверка на тест, который открывается во 2-м
+        # Проверка на тест, который открывается во 2-м окне
         original_window = self.driver.current_window_handle 
         for window_handle in self.driver.window_handles:
             if window_handle != original_window:
                 self.driver.switch_to.window(window_handle)
                 break
+        # Переход к первому заданию в тесте
+        current_url = self.driver.current_url
+        new_url = current_url.replace("page=", '')
+        self.driver.get(new_url)
+        self._execution_test()
+    
+    def _execution_test(self) -> None:
+        start_time = time.time()
         # Переходит на следующее задание теста
         while True:
-            time.sleep(random.randint(30, 270))
+            time.sleep(random.randint(2, 5))
             try: 
                 self.driver.find_element(By.ID, navigation_button_id).click()
             except: break
