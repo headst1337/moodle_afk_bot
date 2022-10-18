@@ -60,7 +60,7 @@ class Eios:
         start_time = time.time()
         # Переходит на следующее задание теста
         while True:
-            time.sleep(random.randint(2, 5))
+            time.sleep(random.randint(30, 270))
             try: 
                 self.driver.find_element(By.ID, navigation_button_id).click()
             except: break
