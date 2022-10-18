@@ -1,27 +1,23 @@
 import time
 import random
-import logging
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
+import logger
 from config import *
-log = logging.getLogger("my_log")
-log.setLevel(logging.INFO)
-FH = logging.FileHandler('logs.log')
-basic_formater = logging.Formatter('%(asctime)s : [%(levelname)s] : %(message)s')
-FH.setFormatter(basic_formater)
-log.addHandler(FH)
+
+
+log = logger.get_logger(__name__)
 
 class Eios:
     def __init__(self, username, password) -> None:
         self.username = username
         self.password = password
-        # self.options = webdriver.ChromeOptions()
-        # self.options.add_argument('headless')
-        # self.driver = webdriver.Chrome(options=self.options)
-        self.driver = webdriver.Chrome()
+        self.options = webdriver.ChromeOptions()
+        self.options.add_argument('headless')
+        self.driver = webdriver.Chrome(options=self.options)
         self._auth()
 
     def _auth (self) -> None:
@@ -59,12 +55,18 @@ class Eios:
     def _execution_test(self) -> None:
         start_time = time.time()
         # Переходит на следующее задание теста
-        while True:
-            time.sleep(random.randint(30, 270))
-            try: 
-                self.driver.find_element(By.ID, navigation_button_id).click()
-            except: break
+        while self._exist_element_by_id(navigation_button_id):
+            time.sleep(random.randint(30, ))
+            self.driver.find_element(By.ID, navigation_button_id).click()
+            if self.driver.current_url == auth_url:
+                log.error(f"Session timed out - {self.username}")
         # Рассчитывание продолжительности теста
         duration = time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))
         log.info(f"Finished {self.username} in {duration}")
         self.driver.close()
+    
+    def _exist_element_by_id(self, element) -> bool:
+        try:
+            self.driver.find_element(By.ID, element)
+            return True
+        except: return False
