@@ -6,7 +6,7 @@ username_list = []
 password_list = []
 
 def parse_accounts():
-    with open("accounts.txt", "r") as f:
+    with open("accounts.txt", "r", encoding="utf-8") as f:
         lines = f.readlines()
         for line in lines:
             line = line.replace("\n", "")
