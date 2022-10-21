@@ -1,6 +1,9 @@
 import threading
+import logger
 from afk_bot import Eios
 
+
+log = logger.get_logger(__name__)
 
 username_list = []
 password_list = []
@@ -23,3 +26,4 @@ if __name__ == "__main__":
     for i in range(len(password_list)):
         thread = threading.Thread(target=instantiation, args=[i])
         thread.start()
+    log.info("Script completed!")
