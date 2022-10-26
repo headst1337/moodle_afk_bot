@@ -1,9 +1,6 @@
 import threading
-import logger
 from afk_bot import Eios
 
-
-log = logger.get_logger(__name__)
 
 username_list = []
 password_list = []
@@ -13,8 +10,8 @@ def parse_accounts():
         lines = f.readlines()
         for line in lines:
             line = line.replace("\n", "")
-            username_list.append(line.split(" ")[0])
-            password_list.append(line.split(" ")[1])
+            username_list.append(line.split(" ", 1)[0])
+            password_list.append(line.split(" ", 1)[1])
     return(username_list, password_list)        
 
 
@@ -23,7 +20,6 @@ def instantiation(i):
 
 if __name__ == "__main__":
     parse_accounts()
-    for i in range(len(password_list)):
+    for i in range(len(username_list)):
         thread = threading.Thread(target=instantiation, args=[i])
         thread.start()
-    log.info("Script completed!")

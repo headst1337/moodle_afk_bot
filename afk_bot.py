@@ -40,6 +40,8 @@ class Eios:
             self.driver.find_element(By.XPATH, start_test_button_xpath).click()
         elif self._exist_element_by_xpath(alternative_start_test_button_xpath):
              self.driver.find_element(By.XPATH, alternative_start_test_button_xpath).click()
+        elif self._exist_element_by_xpath(By.XPATH, second_alternative_start_test_button_xpath):
+            self.driver.find_element(By.XPATH, second_alternative_start_test_button_xpath).click()
         else: log.error(f"Can not be found test start button or login failed - {self.username}")
         time.sleep(random.randint(2, 5))
         log.info(f"Started {self.username}")
