@@ -60,8 +60,13 @@ class Eios:
         log.info(f"Started {self.username}")
         
         # Проверка на тест, который открывается во 2-м окне
-        original_window = self.driver.current_window_handle
-        self.driver.switch_to.window(next(w for w in self.driver.window_handles if w != original_window))
+        # original_window = self.driver.current_window_handle
+        # self.driver.switch_to.window(next(w for w in self.driver.window_handles if w != original_window))
+        original_window = self.driver.current_window_handle 
+        for window_handle in self.driver.window_handles:
+            if window_handle != original_window:
+                self.driver.switch_to.window(window_handle)
+                break
         
         # Переход к первому заданию в тесте
         current_url = self.driver.current_url
