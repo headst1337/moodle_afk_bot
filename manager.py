@@ -1,13 +1,15 @@
-import asyncio
+import threading
 from afk_bot import Eios
 
-
-async def instantiate(username, password):
+def instantiate(username, password):
     instance = Eios(username=username, password=password)
 
-async def run(credentials):
-    tasks = [asyncio.create_task(instantiate(username, password)) for username, password in credentials]
-    await asyncio.gather(*tasks)
+def run(credentials):
+    threads = [threading.Thread(target=instantiate, args=(username, password)) for username, password in credentials]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
 
 def remove_completed_accounts(completed_accounts):
     with open("accounts.txt", "r", encoding="utf-8") as f:
@@ -37,5 +39,5 @@ def parse_accounts():
 
 if __name__ == "__main__":
     credentials = parse_accounts()
-    asyncio.run(run(credentials))
+    run(credentials)
     remove_completed_accounts(get_completed_accounts())
