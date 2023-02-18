@@ -1,25 +1,41 @@
-import threading
+import asyncio
 from afk_bot import Eios
 
 
-username_list = []
-password_list = []
+async def instantiate(username, password):
+    instance = Eios(username=username, password=password)
+
+async def run(credentials):
+    tasks = [asyncio.create_task(instantiate(username, password)) for username, password in credentials]
+    await asyncio.gather(*tasks)
+
+def remove_completed_accounts(completed_accounts):
+    with open("accounts.txt", "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    # Отфильтровать успешные аккаунты
+    remaining_accounts = [line for line in lines if line.split()[0] not in completed_accounts]
+
+    # Перезаписать файл оставшимися учетными записями
+    with open("accounts.txt", "w", encoding="utf-8") as f:
+        f.writelines(remaining_accounts)
+
+def get_completed_accounts():
+    with open("completed_accounts.txt", "r", encoding="utf-8") as f:
+        lines = f.readlines()
+        completed_accounts = [line.strip().split()[0] for line in lines]
+    return completed_accounts
 
 def parse_accounts():
+    credentials = []
     with open("accounts.txt", "r", encoding="utf-8") as f:
         lines = f.readlines()
         for line in lines:
-            line = line.replace("\n", "")
-            username_list.append(line.split(" ", 1)[0])
-            password_list.append(line.split(" ", 1)[1])
-    return(username_list, password_list)        
-
-
-def instantiation(i):
-    instance = Eios(username=username_list[i], password=password_list[i])
+            username, password = line.strip().split(" ")
+            credentials.append((username, password))
+    return credentials
 
 if __name__ == "__main__":
-    parse_accounts()
-    for i in range(len(username_list)):
-        thread = threading.Thread(target=instantiation, args=[i])
-        thread.start()
+    credentials = parse_accounts()
+    asyncio.run(run(credentials))
+    remove_completed_accounts(get_completed_accounts())
