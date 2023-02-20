@@ -42,7 +42,7 @@ class Eios:
     def _open_test(self) -> None:
         # Открытие страницы с тестом
         self.driver.get(url)
-        time.sleep(random.uniform(2, 5))
+        time.sleep(random.uniform(5, 10))
 
         # Нажатие кнопки, которая открывает тест
         start_test_button_xpaths = [start_test_button_xpath, alternative_start_test_button_xpath, 

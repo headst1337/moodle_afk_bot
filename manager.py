@@ -11,22 +11,9 @@ def run(credentials):
     for thread in threads:
         thread.join()
 
-def remove_completed_accounts(completed_accounts):
-    with open("accounts.txt", "r", encoding="utf-8") as f:
-        lines = f.readlines()
-
-    # Отфильтровать успешные аккаунты
-    remaining_accounts = [line for line in lines if line.split()[0] not in completed_accounts]
-
-    # Перезаписать файл оставшимися учетными записями
-    with open("accounts.txt", "w", encoding="utf-8") as f:
-        f.writelines(remaining_accounts)
-
-def get_completed_accounts():
-    with open("success.txt", "r", encoding="utf-8") as f:
-        lines = f.readlines()
-        completed_accounts = [line.strip().split()[0] for line in lines]
-    return completed_accounts
+def remove_completed_accounts():
+    with open("success.txt", "w", encoding="utf-8") as f:
+        f.truncate(0)
 
 def parse_accounts():
     credentials = []
@@ -38,7 +25,7 @@ def parse_accounts():
     return credentials
 
 if __name__ == "__main__":
-    remove_completed_accounts(get_completed_accounts())
+    remove_completed_accounts()
     credentials = parse_accounts()
     run(credentials)
     
