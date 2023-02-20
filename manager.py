@@ -1,13 +1,16 @@
 import threading
 from afk_bot import Eios
 
-def instantiate(username, password):
-    instance = Eios(username=username, password=password)
-    return instance
+MAX_THREADS = 16
+
+def instantiate(username, password, semaphore):
+    with semaphore:
+        instance = Eios(username=username, password=password)
+        instance.run()
 
 def run(credentials):
-    instances = [instantiate(username, password) for username, password in credentials]
-    threads = [threading.Thread(target=instance.run) for instance in instances]
+    semaphore = threading.Semaphore(MAX_THREADS)
+    threads = [threading.Thread(target=instantiate, args=(username, password, semaphore)) for username, password in credentials]
     for thread in threads:
         thread.start()
     for thread in threads:
