@@ -38,6 +38,7 @@ def parse_accounts():
     return credentials
 
 if __name__ == "__main__":
+    remove_completed_accounts(get_completed_accounts())
     credentials = parse_accounts()
     run(credentials)
-    remove_completed_accounts(get_completed_accounts())
+    
