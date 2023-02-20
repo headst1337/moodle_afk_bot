@@ -3,9 +3,11 @@ from afk_bot import Eios
 
 def instantiate(username, password):
     instance = Eios(username=username, password=password)
+    return instance
 
 def run(credentials):
-    threads = [threading.Thread(target=instantiate, args=(username, password)) for username, password in credentials]
+    instances = [instantiate(username, password) for username, password in credentials]
+    threads = [threading.Thread(target=instance.run) for instance in instances]
     for thread in threads:
         thread.start()
     for thread in threads:
@@ -28,4 +30,3 @@ if __name__ == "__main__":
     remove_completed_accounts()
     credentials = parse_accounts()
     run(credentials)
-    
