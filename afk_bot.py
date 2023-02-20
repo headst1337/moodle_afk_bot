@@ -99,9 +99,24 @@ class Eios:
         self._write_success()
 
     def _write_success(self):
+        success_str = f"{self.username} {self.password}"
+
+        # Добавляем строку в файл success.txt
         with open("success.txt", "a", encoding="utf-8") as f:
-            f.write(f"{self.username} {self.password}\n")
-    
+            f.write(f"{success_str}\n")
+
+        # Открываем файл "accounts.txt" для чтения и записи
+        with open("accounts.txt", "r+") as f:
+            lines = f.readlines()  # Читаем все строки из файла
+
+            # Ищем строку, которую нужно удалить
+            f.seek(0)  # Устанавливаем указатель в начало файла
+            for line in lines:
+                if line.strip() != success_str:
+                    f.write(line)  # Записываем строку обратно в файл
+
+            f.truncate()  # Усекаем файл до текущей позиции указателя
+
     def _exist_element_by_id(self, element) -> bool:
         try:
             self.driver.find_element(By.ID, element)

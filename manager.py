@@ -23,7 +23,7 @@ def remove_completed_accounts(completed_accounts):
         f.writelines(remaining_accounts)
 
 def get_completed_accounts():
-    with open("completed_accounts.txt", "r", encoding="utf-8") as f:
+    with open("success.txt", "r", encoding="utf-8") as f:
         lines = f.readlines()
         completed_accounts = [line.strip().split()[0] for line in lines]
     return completed_accounts
