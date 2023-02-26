@@ -25,12 +25,12 @@ def parse_accounts():
     with open("accounts.txt", "r", encoding="utf-8") as f:
         lines = f.readlines()
         for line in lines:
-            values = line.strip().split(" ")
-            if len(values) >= 2:
-                username = values[0]
-                password = " ".join(values[1:])
+            values = line.strip().split(" ", 1)
+            if len(values) == 2:
+                username, password = values
                 credentials.append((username, password))
     return credentials
+
 
 
 if __name__ == "__main__":
