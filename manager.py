@@ -26,10 +26,12 @@ def parse_accounts():
         lines = f.readlines()
         for line in lines:
             values = line.strip().split(" ")
-            if len(values) == 2:
-                username, password = values
+            if len(values) >= 2:
+                username = values[0]
+                password = " ".join(values[1:])
                 credentials.append((username, password))
     return credentials
+
 
 if __name__ == "__main__":
     remove_completed_accounts()
