@@ -106,7 +106,7 @@ class Eios:
             f.write(f"{success_str}\n")
 
         # Открываем файл "accounts.txt" для чтения и записи
-        with open("accounts.txt", "r+") as f:
+        with open("accounts.txt", "r+", encoding="utf-8") as f:
             lines = f.readlines()  # Читаем все строки из файла
 
             # Ищем строку, которую нужно удалить
