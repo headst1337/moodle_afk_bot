@@ -89,14 +89,16 @@ class Eios:
                 raise ValueError(error_message)
         
         # Рассчитывание продолжительности теста
+        duration_int = time.monotonic() - start_time
         duration = time.strftime("%H:%M:%S", time.gmtime(time.monotonic() - start_time))
         log.info(f"Finished {self.username} in {duration}")
-        
+
+        if duration_int >= 60:
+            # Добавление текущего аккаунта в список успешного прохождения теста
+            self._write_success()  
+
         # Закрытие окна теста
         self.driver.close()
-        
-        # Добавление текущего аккаунта в список успешного прохождения теста
-        self._write_success()
 
     def _write_success(self):
         success_str = f"{self.username} {self.password}"
