@@ -1,131 +1,136 @@
+"""Модуль c ботом."""
+
 import time
 import random
+from logging import Logger
+
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 
-import logger
-from config import *
+from logger import get_logger
+from utils import write_success
+from config import (
+    url,
+    auth_url,
+    username_xpath,
+    password_xpath,
+    login_button_xpath,
+    start_test_button_xpath,
+    alternative_start_test_button_xpath,
+    second_alternative_start_test_button_xpath,
+    navigation_button_id,
+)
 
-
-log = logger.get_logger(__name__)
 
 class Eios:
-    def __init__(self, username, password) -> None:
+    """Класс бота для прохождения теста на платформе Eios."""
+    def __init__(self, username: str, password: str, logger: Logger) -> None:
         self.username = username
         self.password = password
         self.options = webdriver.ChromeOptions()
-        self.options.headless = True
+        self.options.headless = False
+        self.options.add_argument("--disable-popup-blocking")
         self.driver = webdriver.Chrome(options=self.options)
-        self._auth()
+        self.log = logger
+        self.__auth()
+        self.log.info(f"test {self.username}")
 
-
-    def _auth(self) -> None:
+    def __auth(self) -> None:
+        """Авторизация на платформе Eios."""
         self.driver.get(auth_url)
         username_element = self.driver.find_element(By.XPATH, username_xpath)
         password_element = self.driver.find_element(By.XPATH, password_xpath)
         login_button = self.driver.find_element(By.XPATH, login_button_xpath)
 
-        # Ввод данных авторизации
         username_element.send_keys(self.username)
         password_element.send_keys(self.password)
 
-        # Нажатие кнопки авторизации
         login_button.click()
 
         time.sleep(random.uniform(2, 5))
-        log.info(f"Auth as {self.username} {self.password}")
-        self._open_test()
+        self.log.info(f"Auth as {self.username} {self.password}")
+        self.__open_test()
 
 
-    def _open_test(self) -> None:
-        # Открытие страницы с тестом
+    def __open_test(self) -> None:
+        """Открытие теста."""
         self.driver.get(url)
         time.sleep(random.uniform(5, 10))
 
-        # Нажатие кнопки, которая открывает тест
-        start_test_button_xpaths = [start_test_button_xpath, alternative_start_test_button_xpath, 
-                                    second_alternative_start_test_button_xpath]
+        start_test_button_xpaths = [
+            start_test_button_xpath,
+            alternative_start_test_button_xpath, 
+            second_alternative_start_test_button_xpath
+        ]
+
         for xpath in start_test_button_xpaths:
-            if self._exist_element_by_xpath(xpath):
+            if self.__exist_element_by_xpath(xpath):
                 self.driver.find_element(By.XPATH, xpath).click()
                 break
         else:
-            error_message = f"Can not find test start button or login failed - {self.username}"
-            log.error(error_message)
+            error_message = (
+                f"Can not find test start button or login failed - {self.username}"
+            )
+            self.log.error(error_message)
             raise ValueError(error_message)
-        
+
         time.sleep(random.uniform(2, 5))
-        log.info(f"Started {self.username}")
-        
-        # Проверка на тест, который открывается во 2-м окне
-        # original_window = self.driver.current_window_handle
-        # self.driver.switch_to.window(next(w for w in self.driver.window_handles if w != original_window))
+        self.log.info(f"Started {self.username}")
+
         original_window = self.driver.current_window_handle 
         for window_handle in self.driver.window_handles:
             if window_handle != original_window:
                 self.driver.switch_to.window(window_handle)
                 break
-        
-        # Переход к первому заданию в тесте
+
         current_url = self.driver.current_url
         new_url = current_url.replace("page=", '')
         self.driver.get(new_url)
-        self._execution_test()
+        self.__execution_test()
 
-    
-    def _execution_test(self) -> None:
+
+    def __execution_test(self) -> None:
+        """Прохождение теста."""
         start_time = time.monotonic()
+
+        try:
+            while self.__exist_element_by_id(navigation_button_id):
+                #time.sleep(random.uniform(30, 270))
+                time.sleep(random.uniform(2, 3))
+                self.driver.find_element(By.ID, navigation_button_id).click()
+
+                if self.driver.current_url == auth_url:
+                    error_message = f"Session timed out - {self.username}"
+                    self.log.error(error_message)
+                    raise ValueError(error_message)
+            duration_int = time.monotonic() - start_time
+            duration = self.__cacl_duration(start_time)
+            self.log.info(f"Finished {self.username} in {duration}")
+            if duration_int >= 60:
+                write_success(self.username, self.password)  
+        except:
+            duration = self.__cacl_duration(start_time)
+            self.log.error(f"Finished with error {self.username} in {duration}")
+        finally:
+            self.driver.close()
         
-        # Переходит на следующее задание теста
-        while self._exist_element_by_id(navigation_button_id):
-            time.sleep(random.uniform(30, 270))
-            self.driver.find_element(By.ID, navigation_button_id).click()
-            
-            if self.driver.current_url == auth_url:
-                error_message = f"Session timed out - {self.username}"
-                log.error(error_message)
-                raise ValueError(error_message)
-        
-        # Рассчитывание продолжительности теста
-        duration_int = time.monotonic() - start_time
-        duration = time.strftime("%H:%M:%S", time.gmtime(time.monotonic() - start_time))
-        log.info(f"Finished {self.username} in {duration}")
+    def __cacl_duration(self, start_time: float) -> str:
+        """Расчет времени прохождения теста."""
+        duration = time.strftime(
+            "%H:%M:%S",
+            time.gmtime(time.monotonic() - start_time)
+        )
+        return duration
 
-        if duration_int >= 60:
-            # Добавление текущего аккаунта в список успешного прохождения теста
-            self._write_success()  
-
-        # Закрытие окна теста
-        self.driver.close()
-
-    def _write_success(self):
-        success_str = f"{self.username} {self.password}"
-
-        # Добавляем строку в файл success.txt
-        with open("success.txt", "a", encoding="utf-8") as f:
-            f.write(f"{success_str}\n")
-
-        # Открываем файл "accounts.txt" для чтения и записи
-        with open("accounts.txt", "r+", encoding="utf-8") as f:
-            lines = f.readlines()  # Читаем все строки из файла
-
-            # Ищем строку, которую нужно удалить
-            f.seek(0)  # Устанавливаем указатель в начало файла
-            for line in lines:
-                if line.strip() != success_str:
-                    f.write(line)  # Записываем строку обратно в файл
-
-            f.truncate()  # Усекаем файл до текущей позиции указателя
-
-    def _exist_element_by_id(self, element) -> bool:
+    def __exist_element_by_id(self, element) -> bool:
+        """Проверка наличия элемента по id."""
         try:
             self.driver.find_element(By.ID, element)
             return True
         except: return False
 
-    def _exist_element_by_xpath(self, element) -> bool:
+    def __exist_element_by_xpath(self, element) -> bool:
+        """Проверка наличия элемента по xpath."""
         try:
             self.driver.find_element(By.XPATH, element)
             return True
