@@ -1,8 +1,7 @@
 ### Requirements
 **- You need to download [ChromeDriver]( https://chromedriver.chromium.org/ "ChromeDriver") of the same version as your browser**
 
-**- Create file `accounts.txt`**
-**- Create file `success.txt`**
+**- Create file `accounts.txt`** **and `success.txt`**
 
 
 **- Install requirements**
