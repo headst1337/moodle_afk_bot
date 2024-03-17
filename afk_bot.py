@@ -33,7 +33,6 @@ class Eios:
         self.driver = webdriver.Chrome(options=self.options)
         self.log = logger
         self.__auth()
-        self.log.info(f"test {self.username}")
 
     def __auth(self) -> None:
         """Авторизация на платформе Eios."""
