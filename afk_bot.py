@@ -7,7 +7,6 @@ from logging import Logger
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-from logger import get_logger
 from utils import write_success
 from config import (
     url,

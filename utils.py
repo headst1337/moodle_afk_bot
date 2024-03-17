@@ -1,6 +1,5 @@
 """Дополнительные функции."""
 
-
 def write_success(username: str, password: str):
     """Запись успешного прохождения теста в файл."""
     success_str = f"{username} {password}"
@@ -15,4 +14,3 @@ def write_success(username: str, password: str):
             if line.strip() != success_str:
                 f.write(line)
         f.truncate()
-        
