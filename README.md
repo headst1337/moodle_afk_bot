@@ -3,6 +3,7 @@
 
 **- Create file `accounts.txt`** **and `success.txt`**
 
+**Accounts mask: `email pass`**
 
 **- Install requirements**
 ```bash
