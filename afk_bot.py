@@ -6,6 +6,8 @@ from logging import Logger
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from utils import write_success
 from config import (
@@ -61,9 +63,11 @@ class Eios:
             second_alternative_start_test_button_xpath
         ]
 
+        wait = WebDriverWait(self.driver, 10)
         for xpath in start_test_button_xpaths:
             if self.__exist_element_by_xpath(xpath):
-                self.driver.find_element(By.XPATH, xpath).click()
+                start_test_button = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+                start_test_button.click()
                 break
         else:
             error_message = (
@@ -90,12 +94,10 @@ class Eios:
     def __execution_test(self) -> None:
         """Прохождение теста."""
         start_time = time.monotonic()
-
         try:
             while self.__exist_element_by_id(navigation_button_id):
                 time.sleep(random.uniform(30, 270))
                 self.driver.find_element(By.ID, navigation_button_id).click()
-
                 if self.driver.current_url == auth_url:
                     error_message = f"Session timed out - {self.username}"
                     self.log.error(error_message)
@@ -104,7 +106,7 @@ class Eios:
             duration = self.__cacl_duration(start_time)
             self.log.info(f"Finished {self.username} in {duration}")
             if duration_int <= 1800:
-                write_success(self.username, self.password)  
+                write_success(self.username, self.password)
         except:
             duration = self.__cacl_duration(start_time)
             self.log.error(f"Finished with error {self.username} in {duration}")
