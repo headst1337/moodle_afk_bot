@@ -95,8 +95,7 @@ class Eios:
 
         try:
             while self.__exist_element_by_id(navigation_button_id):
-                #time.sleep(random.uniform(30, 270))
-                time.sleep(random.uniform(2, 3))
+                time.sleep(random.uniform(30, 270))
                 self.driver.find_element(By.ID, navigation_button_id).click()
 
                 if self.driver.current_url == auth_url:
@@ -106,7 +105,7 @@ class Eios:
             duration_int = time.monotonic() - start_time
             duration = self.__cacl_duration(start_time)
             self.log.info(f"Finished {self.username} in {duration}")
-            if duration_int >= 60:
+            if duration_int <= 1800:
                 write_success(self.username, self.password)  
         except:
             duration = self.__cacl_duration(start_time)

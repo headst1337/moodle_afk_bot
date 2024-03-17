@@ -10,7 +10,7 @@ from afk_bot import Eios
 from logger import get_logger
 
 
-MAX_THREADS = 2 # Константа для ограничения количества потоков.
+MAX_THREADS = 16 # Константа для ограничения количества потоков.
 TRYIES = 2 # Константа для ограничения количества попыток.
 
 
